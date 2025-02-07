@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.FileHandler;
@@ -17,15 +18,11 @@ public class MultiThreadedServer {
     private static final Logger logger = Logger.getLogger(MultiThreadedServer.class.getName());
     private ServerSocket serverSocket;
     private final ExecutorService threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    private final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
 
     public void start() {
         try {
-            // Setup logger
-            FileHandler fileHandler = new FileHandler("multithreaded_server.log", true);
-            fileHandler.setFormatter(new SimpleFormatter());
-            logger.addHandler(fileHandler);
-
-            // Start server
+            setupLogger();
             serverSocket = new ServerSocket(PORT);
             logger.info("Server started on port: " + PORT);
 
@@ -51,7 +48,14 @@ public class MultiThreadedServer {
 
             String message = inFromClient.readLine();
             logger.info("Received message from client: " + message);
-            outToClient.println("Hello from the Server");
+            
+            // Check cache for response
+            String response = cache.computeIfAbsent(message, k -> {
+                logger.info("Processing new request: " + k);
+                return "Hello from the Server - Cached Response for: " + k;
+            });
+
+            outToClient.println(response);
         } catch (IOException ex) {
             logger.log(Level.SEVERE, "Error handling client", ex);
         } finally {
@@ -61,6 +65,16 @@ public class MultiThreadedServer {
             } catch (IOException ex) {
                 logger.log(Level.SEVERE, "Error closing client socket", ex);
             }
+        }
+    }
+
+    private void setupLogger() {
+        try {
+            FileHandler fileHandler = new FileHandler("multithreaded_server.log", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+            logger.addHandler(fileHandler);
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "Error setting up logger", ex);
         }
     }
 
