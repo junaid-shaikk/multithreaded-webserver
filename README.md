@@ -1,6 +1,6 @@
-# Multithreaded Web Server and Client Implementations in Java
+# Multithreaded Web Server and Client with Cache Implementations in Java
 
-This repository contains various implementations of Java servers and clients using socket programming. The servers demonstrate handling requests in different ways: single-threaded, multi-threaded, and with a thread pool. The **ThreadPool Server** is designed to handle high-load scenarios and can be tested using JMeter.
+This repository contains various implementations of Java servers and clients using socket programming. The servers demonstrate handling requests in different ways: single-threaded, multi-threaded, and with a thread pool. The **ThreadPool** Server is designed to handle high-load scenarios and can be tested using JMeter. Additionally, a caching mechanism is implemented to optimize performance by storing and reusing responses for repeated client requests, reducing server processing time and improving efficiency.
 
 ---
 
